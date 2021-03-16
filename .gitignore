@@ -5,4 +5,4 @@
 crash.log
 
 # Ansible inventory
-ansible/inventory/gcp.yml
+gcp.yml
