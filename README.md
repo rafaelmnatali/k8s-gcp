@@ -21,8 +21,10 @@ This tutorial intends to demonstrate how one can use [Infrastructure as Code (Ia
 
 The local environment used to test the scripts had the following software:
 
-- `macOS BigSur 11.2.1`
-- `Ansible 3.1.0`
-- `Python 3.8.2`
+| Software | Version |
+|--|--|
+| macOS BigSur | 11.2.1 |
+| Ansible | 3.1.0 |
+| Python | 3.8.2 |
 
 ## Next Steps
