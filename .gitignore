@@ -1,0 +1,8 @@
+# MacOS
+.DS_Store
+
+# Crash log files
+crash.log
+
+# Ansible inventory
+.ansible/inventory/gcp.yml
