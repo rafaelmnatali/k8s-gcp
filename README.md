@@ -50,9 +50,17 @@ Refer to Ansible documentation on [How to build your inventory](https://docs.ans
 
 ## How to use this repository
 
-Provision the `Kubernetes` cluster executing the following command:
+### Provision Kubernetes
+
+Execute the following command to provision the `Kubernetes` cluster:
 
 `ansible-playbook ansible/create-gke.yml -i ansible/inventory/<your-inventory-filename>`
+
+### Destroy Kubernetes
+
+Execute the following command to destroy the `Kubernetes` cluster:
+
+`ansible-playbook ansible/destroy-gke.yml -i ansible/inventory/<your-inventory-filename>`
 
 ## References
 
