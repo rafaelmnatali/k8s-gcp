@@ -48,6 +48,12 @@ all:
 
 Refer to Ansible documentation on [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information.
 
+## How to use this repository
+
+Provision the `Kubernetes` cluster executing the following command:
+
+`ansible-playbook ansible/create-gke.yml -i ansible/inventory/<your-inventory-filename>`
+
 ## References
 
 - [Ansible Google Cloud Modules](https://docs.ansible.com/ansible/latest/collections/google/cloud/index.html)
