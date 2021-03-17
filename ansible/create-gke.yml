@@ -6,4 +6,4 @@
     GOOGLE_CREDENTIALS: "{{ credentials_file }}"
    
   roles:
-    - gcloud
+    - network

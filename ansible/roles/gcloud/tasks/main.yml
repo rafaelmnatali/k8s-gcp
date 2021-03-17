@@ -1,8 +1,0 @@
----
-# GCLOUD AUTH SERVICE ACCOUNT
-- name: authenticate service account 
-  command: "gcloud auth activate-service-account {{ gcloud_service_account }} --key-file={{ credentials_file }} --project={{ project_id }}"
-  changed_when: false
-  register: gcloud_auth
-  failed_when: 
-    - '"Activated service account credentials for: [{{ gcloud_service_account }}]" not in gcloud_auth.stderr_lines'
