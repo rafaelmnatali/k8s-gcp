@@ -1,0 +1,9 @@
+---
+- name: create infra
+  hosts: localhost
+  gather_facts: false
+  environment:
+    GOOGLE_CREDENTIALS: "{{ credentials_file }}"
+   
+  roles:
+    - gcloud
