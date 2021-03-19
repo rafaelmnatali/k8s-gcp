@@ -65,20 +65,20 @@ Execute the following command to provision the `Kubernetes` cluster:
 
 **Output:**
 
-```bash
-PLAY [create infra] *****************************************************************************
+```text
+PLAY [create infra] ****************************************************************
 
-TASK [network : create GCP network] *************************************************************
+TASK [network : create GCP network] ************************************************
 changed: [localhost]
 
-TASK [k8s : create k8s cluster] *****************************************************************
+TASK [k8s : create k8s cluster] ****************************************************
 changed: [localhost]
 
-TASK [k8s : create k8s node pool] ***************************************************************
+TASK [k8s : create k8s node pool] **************************************************
 changed: [localhost]
 
-PLAY RECAP **************************************************************************************
-localhost: ok=3    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+PLAY RECAP *************************************************************************
+localhost: ok=3  changed=3  unreachable=0  failed=0  skipped=0  rescued=0  ignored=0 
 ```
 
 ### Connecting to the Kubernetes cluster
@@ -115,16 +115,16 @@ Execute the following command to destroy the `Kubernetes` cluster:
 **Output:**
 
 ```bash
-PLAY [destroy infra] *****************************************************************************
+PLAY [destroy infra] *********************************************************************
 
-TASK [destroy_k8s : destroy k8s cluster] *********************************************************
+TASK [destroy_k8s : destroy k8s cluster] *************************************************
 changed: [localhost]
 
-TASK [destroy_network : destroy GCP network] *****************************************************
+TASK [destroy_network : destroy GCP network] *********************************************
 changed: [localhost]
 
-PLAY RECAP ***************************************************************************************
-localhost: ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+PLAY RECAP *******************************************************************************
+localhost: ok=2   changed=2   unreachable=0   failed=0   skipped=0   rescued=0   ignored=0 
 ```
 
 ## References
