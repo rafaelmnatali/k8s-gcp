@@ -114,7 +114,7 @@ Execute the following command to destroy the `Kubernetes` cluster:
 
 **Output:**
 
-```bash
+```text
 PLAY [destroy infra] *********************************************************************
 
 TASK [destroy_k8s : destroy k8s cluster] *************************************************
