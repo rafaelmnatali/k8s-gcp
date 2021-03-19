@@ -125,8 +125,6 @@ PLAY RECAP *********************************************************************
 localhost: ok=2   changed=2   unreachable=0   failed=0   skipped=0   rescued=0   ignored=0 
 ```
 
-## References
-
-- [Ansible Google Cloud Modules](https://docs.ansible.com/ansible/latest/collections/google/cloud/index.html)
-
 ## Next Steps
+
+Visit the [Ansible Google Cloud Modules](https://docs.ansible.com/ansible/latest/collections/google/cloud/index.html) page for more modules and configurations.
