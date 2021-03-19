@@ -103,7 +103,7 @@ After connecting to the cluster use the [kubectl](https://kubernetes.io/docs/ref
 ```text
 kubectl get nodes
 NAME                                                STATUS   ROLES    AGE   VERSION
-gke-<cluster_name>-node-pool-e058a106-zn2b        Ready    <none>   10m   v1.18.12-gke.1210
+gke-<cluster_name>-node-pool-e058a106-zn2b          Ready    <none>   10m   v1.18.12-gke.1210
 ```
 
 ### Cleaning up
