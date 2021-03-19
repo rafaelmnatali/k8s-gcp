@@ -30,7 +30,7 @@ The local environment used to test the scripts had the following software:
 
 ## How to use this repository
 
-Create a `yaml` file in the `inventory` folder to allow Ansible to interact with your `GCP` environment.
+Create a `yaml` file in the `ansible/inventory` folder to allow Ansible to interact with your `GCP` environment.
 
 Here is a sample file:
 
