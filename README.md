@@ -28,7 +28,7 @@ The local environment used to test the scripts had the following software:
 | Ansible | 3.1.0 |
 | Python | 3.8.2 |
 
-## Ansible Inventory
+## How to use this repository
 
 Create a `yaml` file in the `inventory` folder to allow Ansible to interact with your `GCP` environment.
 
@@ -54,8 +54,6 @@ all:
 ```
 
 Refer to Ansible documentation on [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information.
-
-## How to use this repository
 
 ### Provision Kubernetes
 
