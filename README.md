@@ -91,7 +91,7 @@ _Note:_ replace the variables with the values used in the inventory file. Also, 
 
 **Output:**
 
-```bash
+```text
 Fetching cluster endpoint and auth data.
 kubeconfig entry generated for devops-platform.
 ```
@@ -100,7 +100,7 @@ kubeconfig entry generated for devops-platform.
 
 After connecting to the cluster use the [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) command-line tool to control the cluster.
 
-```bash
+```text
 kubectl get nodes
 NAME                                                STATUS   ROLES    AGE   VERSION
 gke-<cluster_name>-node-pool-e058a106-zn2b        Ready    <none>   10m   v1.18.12-gke.1210
