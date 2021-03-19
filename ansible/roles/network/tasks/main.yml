@@ -1,4 +1,4 @@
-- name: create a network
+- name: create GCP network
   google.cloud.gcp_compute_network:
     name: network-{{ cluster_name }}
     auto_create_subnetworks: 'true'
@@ -6,3 +6,4 @@
     auth_kind: serviceaccount
     service_account_file: "{{ credentials_file }}"
     state: present
+  register: network

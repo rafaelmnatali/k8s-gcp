@@ -1,9 +1,10 @@
 ---
-- name: destroy infra
+- name: create infra
   hosts: localhost
   gather_facts: false
   environment:
     GOOGLE_CREDENTIALS: "{{ credentials_file }}"
    
   roles:
-    - destroy_network
+    - network
+    - k8s

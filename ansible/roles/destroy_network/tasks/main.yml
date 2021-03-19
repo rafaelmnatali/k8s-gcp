@@ -1,4 +1,4 @@
-- name: destroy a network
+- name: destroy GCP network
   google.cloud.gcp_compute_network:
     name: network-{{ cluster_name }}
     auto_create_subnetworks: 'true'

@@ -37,13 +37,20 @@ Here is a sample file:
 ```yaml
 all:
   vars:
+    # use this section to enter GCP related information
     zone: europe-west2-c
     region: europe-west2
     project_id: <gcp-project-id>
     gcloud_sa_path: "~/gcp-credentials/service-account.json"
     credentials_file: "{{ lookup('env','HOME') }}/{{ gcloud_sa_path }}"
     gcloud_service_account: service-account@project-id.iam.gserviceaccount.com
+
+    # use the section below to enter k8s cluster related information
     cluster_name: <name for your k8s cluster>
+    initial_node_count: 1
+    disk_size_gb: 100
+    disk_type: pd-ssd
+    machine_type: n1-standard-2
 ```
 
 Refer to Ansible documentation on [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information.
@@ -56,11 +63,69 @@ Execute the following command to provision the `Kubernetes` cluster:
 
 `ansible-playbook ansible/create-gke.yml -i ansible/inventory/<your-inventory-filename>`
 
-### Destroy Kubernetes
+**Output:**
+
+```bash
+PLAY [create infra] *****************************************************************************
+
+TASK [network : create GCP network] *************************************************************
+changed: [localhost]
+
+TASK [k8s : create k8s cluster] *****************************************************************
+changed: [localhost]
+
+TASK [k8s : create k8s node pool] ***************************************************************
+changed: [localhost]
+
+PLAY RECAP **************************************************************************************
+localhost: ok=3    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+```
+
+### Connecting to the Kubernetes cluster
+
+Use the [gcloud](https://cloud.google.com/sdk/gcloud) command-line tool to connect to the Kubernetes cluster:
+
+`gcloud container clusters get-credentials <cluster_name> --zone <zone> --project <project_id>`
+
+_Note:_ replace the variables with the values used in the inventory file. Also, It's possible to retrieve this command from the `GCP` console.
+
+**Output:**
+
+```bash
+Fetching cluster endpoint and auth data.
+kubeconfig entry generated for devops-platform.
+```
+
+### Using the Kubernetes cluster
+
+After connecting to the cluster use the [kubectl](https://kubernetes.io/docs/reference/kubectl/overview/) command-line tool to control the cluster.
+
+```bash
+kubectl get nodes
+NAME                                                STATUS   ROLES    AGE   VERSION
+gke-<cluster_name>-node-pool-e058a106-zn2b        Ready    <none>   10m   v1.18.12-gke.1210
+```
+
+### Cleaning up
 
 Execute the following command to destroy the `Kubernetes` cluster:
 
 `ansible-playbook ansible/destroy-gke.yml -i ansible/inventory/<your-inventory-filename>`
+
+**Output:**
+
+```bash
+PLAY [destroy infra] *****************************************************************************
+
+TASK [destroy_k8s : destroy k8s cluster] *********************************************************
+changed: [localhost]
+
+TASK [destroy_network : destroy GCP network] *****************************************************
+changed: [localhost]
+
+PLAY RECAP ***************************************************************************************
+localhost: ok=2    changed=2    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+```
 
 ## References
 
