@@ -28,6 +28,33 @@ The local environment used to test the scripts had the following software:
 | Ansible | 3.1.0 |
 | Python | 3.8.2 |
 
+## Ansible Directory Layout
+
+```bash
+.
+├── LICENSE                    # license file
+├── README.md                  # main documentation file
+└── ansible                    # Ansible top-level folder
+    ├── ansible.cfg            # Ansible config file
+    ├── create-k8s.yml         # Ansible playbook to provision env
+    ├── destroy-k8s.yml        # Ansible playbook to destroy env
+    ├── inventory             
+    │   └── gcp.yml            # Ansible inventory file
+    └── roles
+        ├── destroy_k8s        # Ansible role to remove k8s cluster        
+        │   └── tasks
+        │       └── main.yml
+        ├── destroy_network    # Ansible role to remove VPC
+        │   └── tasks
+        │       └── main.yml
+        ├── k8s                # Ansible role to create k8s cluster
+        │   └── tasks
+        │       └── main.yml
+        └── network            # Ansible role to create VPC
+            └── tasks
+                └── main.yml
+```
+
 ## How to use this repository
 
 Create a `yaml` file in the `ansible/inventory` folder to allow Ansible to interact with your `GCP` environment.
