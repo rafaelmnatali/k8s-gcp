@@ -127,4 +127,4 @@ localhost: ok=2   changed=2   unreachable=0   failed=0   skipped=0   rescued=0  
 
 ## Next Steps
 
-Visit the [Ansible Google Cloud Modules](https://docs.ansible.com/ansible/latest/collections/google/cloud/index.html) page for more modules and configurations.
+Visit [Ansible Documentation](https://docs.ansible.com) page for more information on how to expand your Ansible knowledge and usage.
