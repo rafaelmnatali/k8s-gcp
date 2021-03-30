@@ -1,6 +1,6 @@
 name: Ansible Lint  # feel free to pick your own name
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build:
@@ -23,7 +23,7 @@ jobs:
         # targets: |
         #   playbook_1.yml
         #   playbook_2.yml
-        targets: "./ansible/*.yml"
+        targets: "./"
         # [optional]
         # Arguments to be passed to the ansible-lint
 
