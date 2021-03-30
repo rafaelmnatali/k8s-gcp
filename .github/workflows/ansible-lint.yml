@@ -27,7 +27,6 @@ jobs:
         # [optional]
         # Arguments to be passed to the ansible-lint
         override-deps: |
-          ansible==2.10.7
           ansible-lint==5.0.6
         # Options:
         #   -q                    quieter, although not silent output
