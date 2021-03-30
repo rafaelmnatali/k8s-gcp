@@ -26,7 +26,9 @@ jobs:
         targets: "ansible/*.yml"
         # [optional]
         # Arguments to be passed to the ansible-lint
-
+        override-deps: |
+          ansible==2.9
+          ansible-lint==4.2.0
         # Options:
         #   -q                    quieter, although not silent output
         #   -p                    parseable output in the format of pep8
