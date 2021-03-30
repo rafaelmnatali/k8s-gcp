@@ -7,4 +7,4 @@
 
   roles:
     - network
-    - k8s
+    - k8ss
