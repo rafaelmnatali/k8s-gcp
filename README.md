@@ -114,7 +114,7 @@ Use the [gcloud](https://cloud.google.com/sdk/gcloud) command-line tool to conne
 
 `gcloud container clusters get-credentials <cluster_name> --zone <zone> --project <project_id>`
 
-_Note:_ replace the variables with the values used in the inventory file. Also, It's possible to retrieve this command from the `GCP` console.
+_Note:_ replace the variables with the values used in the inventory file. Also, it's possible to retrieve this command from the `Kubernetes Cluster` page on `GCP` console.
 
 **Output:**
 
@@ -157,3 +157,4 @@ localhost: ok=2   changed=2   unreachable=0   failed=0   skipped=0   rescued=0  
 ## Next Steps
 
 Visit [Ansible Documentation](https://docs.ansible.com) page for more information on how to expand your Ansible knowledge and usage.
+Visit [Ansible Google Cloud Collection](https://docs.ansible.com/ansible/latest/collections/google/cloud/) page for more information on available modules.
