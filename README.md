@@ -19,6 +19,7 @@ This tutorial intends to demonstrate how one can use [Infrastructure as Code (Ia
 - [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - [Ansible Google Cloud Platform Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html)
 - [Installing Python](https://www.python.org/downloads/)
+- [google-auth Python package](https://pypi.org/project/google-auth/)
 
 ## Environment
 
@@ -28,7 +29,7 @@ The local environment used to test the scripts had the following software:
 |--|--|
 | macOS BigSur | 11.2.1 |
 | Ansible | 3.1.0 |
-| Python | 3.8.2 |
+| Python | 3.9.2 |
 
 ## Ansible Directory Layout
 
