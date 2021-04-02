@@ -88,7 +88,7 @@ Refer to Ansible documentation on [How to build your inventory](https://docs.ans
 
 Execute the following command to provision the `Kubernetes` cluster:
 
-`ansible-playbook ansible/create-gke.yml -i ansible/inventory/<your-inventory-filename>`
+`ansible-playbook ansible/create-k8s.yml -i ansible/inventory/<your-inventory-filename>`
 
 **Output:**
 
@@ -137,7 +137,7 @@ gke-<cluster_name>-node-pool-e058a106-zn2b          Ready    <none>   10m   v1.1
 
 Execute the following command to destroy the `Kubernetes` cluster:
 
-`ansible-playbook ansible/destroy-gke.yml -i ansible/inventory/<your-inventory-filename>`
+`ansible-playbook ansible/destroy-k8s.yml -i ansible/inventory/<your-inventory-filename>`
 
 **Output:**
 
