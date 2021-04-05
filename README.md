@@ -20,6 +20,7 @@ This tutorial intends to demonstrate how one can use [Infrastructure as Code (Ia
 - [Ansible Google Cloud Platform Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html)
 - [Installing Python](https://www.python.org/downloads/)
 - [google-auth Python package](https://pypi.org/project/google-auth/)
+- [Ansible Kubernetes Module requirements](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html#requirements)
 
 ## Environment
 
@@ -134,6 +135,18 @@ NAME                                                STATUS   ROLES    AGE   VERS
 gke-<cluster_name>-node-pool-e058a106-zn2b          Ready    <none>   10m   v1.18.12-gke.1210
 ```
 
+### Deploying an application
+
+The role `k8s-deployment` contains an example of how deploy a `NGINX` container in the `Kubernetes` cluster.
+
+The role will create:
+
+- [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+- [Kubernetes Pod](https://kubernetes.io/docs/concepts/workloads/pods/)
+- [Kubernetes Service](https://kubernetes.io/docs/concepts/services-networking/service/)
+
+Investigating the role `directory structure`, we noticed that there is a `vars` folder. We Set variables in roles to ensure a value is used in that role, and is not overridden by inventory variables. Refer to [Using Variables](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-examples) documentation for more details.
+
 ### Cleaning up
 
 Execute the following command to destroy the `Kubernetes` cluster:
@@ -155,7 +168,9 @@ PLAY RECAP *********************************************************************
 localhost: ok=2   changed=2   unreachable=0   failed=0   skipped=0   rescued=0   ignored=0 
 ```
 
-## Next Steps
+## References
 
-Visit [Ansible Documentation](https://docs.ansible.com) page for more information on how to expand your Ansible knowledge and usage.
-Visit [Ansible Google Cloud Collection](https://docs.ansible.com/ansible/latest/collections/google/cloud/) page for more information on available modules.
+- [Ansible Documentation](https://docs.ansible.com) for more information on how to expand your Ansible knowledge and usage.
+- [Ansible Google Cloud Collection](https://docs.ansible.com/ansible/latest/collections/google/cloud/) for more information on available modules.
+- [Ansible Kubernetes module](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html#ansible-collections-kubernetes-core-k8s-module) for more information on `Kubernetes` automation.
+- [Ansible Roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)
