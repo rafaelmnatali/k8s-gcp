@@ -1,5 +1,5 @@
 ---
-- name: create infra
+- name: undeploy application
   hosts: localhost
   gather_facts: false
   environment:

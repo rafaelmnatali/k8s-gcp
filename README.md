@@ -11,7 +11,7 @@ This tutorial intends to demonstrate how one can use [Infrastructure as Code (Ia
 Automations:
 
 - [Provision Kubernetes](#provision-kubernetes)
-- [Deploying an application](deploying-an-application)
+- [Deploying an application](#deploying-an-application)
 
 ## Ansible
 
@@ -183,7 +183,27 @@ export POD_NAME=$(kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath=
 kubectl --namespace nginx port-forward $POD_NAME 8080:80 
 ```
 
-### Cleaning up
+## Cleaning up
+
+### Nginx Namespace and Pod
+
+Execute the following command to remove the `Nginx` resources created but, keep the Kubernetes cluster:
+
+`ansible-playbook ansible/undeploy-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+
+**Output:**
+
+```text
+PLAY [undeploy application] ********************************************************
+
+TASK [destroy_k8s_deployment : Destroy a k8s namespace] ****************************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************
+localhost: ok=1  changed=1  unreachable=0  failed=0  skipped=0  rescued=0  ignored=0 
+```
+
+### Entire Kubernetes Cluster
 
 Execute the following command to destroy the `Kubernetes` cluster:
 
