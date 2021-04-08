@@ -176,12 +176,12 @@ localhost: ok=2  changed=2  unreachable=0  failed=0  skipped=0  rescued=0  ignor
 
 ### Accessing the Nginx
 
+Execute the following commands and then access the `Nginx` using this [URL](http://127.0.0.1:8080).
+
 ```bash
 export POD_NAME=$(kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath="{.items[0].metadata.name}")
 kubectl --namespace nginx port-forward $POD_NAME 8080:80 
 ```
-
-Access the `Nginx` using this [URL](http://127.0.0.1:8080).
 
 ### Cleaning up
 
