@@ -41,25 +41,35 @@ The local environment used to test the scripts had the following software:
 
 ```bash
 .
-├── LICENSE                    # license file
-├── README.md                  # main documentation file
-└── ansible                    # Ansible top-level folder
-    ├── ansible.cfg            # Ansible config file
-    ├── create-k8s.yml         # Ansible playbook to provision env
-    ├── destroy-k8s.yml        # Ansible playbook to destroy env
+├── LICENSE                        # license file
+├── README.md                      # main documentation file
+└── ansible                        # Ansible top-level folder
+    ├── ansible.cfg                # Ansible config file
+    ├── create-k8s.yml             # Ansible playbook to provision env
+    ├── deploy-app-k8s.yml         # Ansible playbook to deploy a Nginx web-server
+    ├── destroy-k8s.yml            # Ansible playbook to destroy env
+    ├── undeploy-app-k8s.yml       # Ansible playbook to remove the Nginx web-server
     ├── inventory             
-    │   └── gcp.yml            # Ansible inventory file
+    │   └── gcp.yml                # Ansible inventory file
     └── roles
-        ├── destroy_k8s        # Ansible role to remove k8s cluster        
+        ├── destroy_k8s            # Ansible role to remove k8s cluster        
         │   └── tasks
         │       └── main.yml
-        ├── destroy_network    # Ansible role to remove VPC
+        ├── destroy_k8s_deployment # Ansible role to remove the Nginx web-server
+        │       └── tasks
+        │           └── main.yml
+        ├── destroy_network        # Ansible role to remove VPC
         │   └── tasks
         │       └── main.yml
-        ├── k8s                # Ansible role to create k8s cluster
+        ├── k8s                    # Ansible role to create k8s cluster
         │   └── tasks
         │       └── main.yml
-        └── network            # Ansible role to create VPC
+        ├── k8s-deployment         # Ansible role to deploy a Nginx web-server
+        │   ├── tasks
+        │   │   └── main.yml
+        │   └── vars
+        │       └── main.yml
+        └── network                # Ansible role to create VPC
             └── tasks
                 └── main.yml
 ```
