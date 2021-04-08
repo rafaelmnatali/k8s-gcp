@@ -6,7 +6,12 @@
 
 This tutorial intends to demonstrate how one can use [Infrastructure as Code (IaC)](https://docs.microsoft.com/en-us/azure/devops/learn/what-is-infrastructure-as-code) to automate the provision of a `Kubernetes` cluster running on `GCP`.
 
-> The designed solution is for learning purposes. Hence, don't treat as production-ready.
+> The presented solutions are intended for learning purposes. Hence, don't treat as production-ready.
+
+Automations:
+
+- [Provision Kubernetes](#provision-kubernetes)
+- [Deploying an application](deploying-an-application)
 
 ## Ansible
 
@@ -82,11 +87,15 @@ all:
     disk_size_gb: 100
     disk_type: pd-ssd
     machine_type: n1-standard-2
+
+    # use the section below to enter k8s namespaces to manage
+    # this namespace is used in the Deploying an Application section
+    namespace: nginx
 ```
 
 Refer to Ansible documentation on [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information.
 
-### Provision Kubernetes
+## Provision Kubernetes
 
 Execute the following command to provision the `Kubernetes` cluster:
 
@@ -135,7 +144,7 @@ NAME                                                STATUS   ROLES    AGE   VERS
 gke-<cluster_name>-node-pool-e058a106-zn2b          Ready    <none>   10m   v1.18.12-gke.1210
 ```
 
-### Deploying an application
+## Deploying an application
 
 The role `k8s-deployment` contains an example of how deploy a `NGINX` container in the `Kubernetes` cluster.
 
@@ -143,9 +152,36 @@ The role will create:
 
 - [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
 - [Kubernetes Pod](https://kubernetes.io/docs/concepts/workloads/pods/)
-- [Kubernetes Service](https://kubernetes.io/docs/concepts/services-networking/service/)
 
-Investigating the role `directory structure`, we noticed that there is a `vars` folder. We Set variables in roles to ensure a value is used in that role, and is not overridden by inventory variables. Refer to [Using Variables](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-examples) documentation for more details.
+Investigating the role `directory structure`, we noticed that there is a `vars` folder. We Set variables in roles to ensure a value is used in that role, and is not overridden by inventory variables. Refer to [Ansible Using Variables](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-examples) documentation for more details.
+
+Execute the following command to deploy the `Nginx` web-server:
+
+`ansible-playbook ansible/deploy-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+
+**Output:**
+
+```text
+PLAY [deploy application] **********************************************************
+
+TASK [k8s-deployment : Create a k8s namespace] *************************************
+changed: [localhost]
+
+TASK [k8s-deployment : Create a k8s service to expose nginx] ***********************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************
+localhost: ok=2  changed=2  unreachable=0  failed=0  skipped=0  rescued=0  ignored=0 
+```
+
+### Accessing the Nginx
+
+```bash
+export POD_NAME=$(kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace nginx port-forward $POD_NAME 8080:80 
+```
+
+Access the `Nginx` using this [URL](http://127.0.0.1:8080).
 
 ### Cleaning up
 
@@ -173,4 +209,4 @@ localhost: ok=2   changed=2   unreachable=0   failed=0   skipped=0   rescued=0  
 - [Ansible Documentation](https://docs.ansible.com) for more information on how to expand your Ansible knowledge and usage.
 - [Ansible Google Cloud Collection](https://docs.ansible.com/ansible/latest/collections/google/cloud/) for more information on available modules.
 - [Ansible Kubernetes module](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html#ansible-collections-kubernetes-core-k8s-module) for more information on `Kubernetes` automation.
-- [Ansible Roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles)
+- [Ansible Roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles) for `roles` specific documentation.
