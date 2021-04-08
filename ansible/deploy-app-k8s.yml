@@ -1,0 +1,9 @@
+---
+- name: deploy application
+  hosts: localhost
+  gather_facts: false
+  environment:
+    GOOGLE_CREDENTIALS: "{{ credentials_file }}"
+
+  roles:
+    - k8s-deployment

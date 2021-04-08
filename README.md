@@ -6,7 +6,12 @@
 
 This tutorial intends to demonstrate how one can use [Infrastructure as Code (IaC)](https://docs.microsoft.com/en-us/azure/devops/learn/what-is-infrastructure-as-code) to automate the provision of a `Kubernetes` cluster running on `GCP`.
 
-> The designed solution is for learning purposes. Hence, don't treat as production-ready.
+> The presented solutions are intended for learning purposes. Hence, don't treat as production-ready.
+
+Automations:
+
+- [Provision Kubernetes](#provision-kubernetes)
+- [Deploying an application](#deploying-an-application)
 
 ## Ansible
 
@@ -20,6 +25,7 @@ This tutorial intends to demonstrate how one can use [Infrastructure as Code (Ia
 - [Ansible Google Cloud Platform Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html)
 - [Installing Python](https://www.python.org/downloads/)
 - [google-auth Python package](https://pypi.org/project/google-auth/)
+- [Ansible Kubernetes Module requirements](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html#requirements)
 
 ## Environment
 
@@ -35,25 +41,35 @@ The local environment used to test the scripts had the following software:
 
 ```bash
 .
-├── LICENSE                    # license file
-├── README.md                  # main documentation file
-└── ansible                    # Ansible top-level folder
-    ├── ansible.cfg            # Ansible config file
-    ├── create-k8s.yml         # Ansible playbook to provision env
-    ├── destroy-k8s.yml        # Ansible playbook to destroy env
+├── LICENSE                        # license file
+├── README.md                      # main documentation file
+└── ansible                        # Ansible top-level folder
+    ├── ansible.cfg                # Ansible config file
+    ├── create-k8s.yml             # Ansible playbook to provision env
+    ├── deploy-app-k8s.yml         # Ansible playbook to deploy a Nginx web-server
+    ├── destroy-k8s.yml            # Ansible playbook to destroy env
+    ├── undeploy-app-k8s.yml       # Ansible playbook to remove the Nginx web-server
     ├── inventory             
-    │   └── gcp.yml            # Ansible inventory file
+    │   └── gcp.yml                # Ansible inventory file
     └── roles
-        ├── destroy_k8s        # Ansible role to remove k8s cluster        
+        ├── destroy_k8s            # Ansible role to remove k8s cluster        
         │   └── tasks
         │       └── main.yml
-        ├── destroy_network    # Ansible role to remove VPC
+        ├── destroy_k8s_deployment # Ansible role to remove the Nginx web-server
+        │       └── tasks
+        │           └── main.yml
+        ├── destroy_network        # Ansible role to remove VPC
         │   └── tasks
         │       └── main.yml
-        ├── k8s                # Ansible role to create k8s cluster
+        ├── k8s                    # Ansible role to create k8s cluster
         │   └── tasks
         │       └── main.yml
-        └── network            # Ansible role to create VPC
+        ├── k8s-deployment         # Ansible role to deploy a Nginx web-server
+        │   ├── tasks
+        │   │   └── main.yml
+        │   └── vars
+        │       └── main.yml
+        └── network                # Ansible role to create VPC
             └── tasks
                 └── main.yml
 ```
@@ -81,11 +97,15 @@ all:
     disk_size_gb: 100
     disk_type: pd-ssd
     machine_type: n1-standard-2
+
+    # use the section below to enter k8s namespaces to manage
+    # this namespace is used in the Deploying an Application section
+    namespace: nginx
 ```
 
 Refer to Ansible documentation on [How to build your inventory](https://docs.ansible.com/ansible/latest/user_guide/intro_inventory.html) for more information.
 
-### Provision Kubernetes
+## Provision Kubernetes
 
 Execute the following command to provision the `Kubernetes` cluster:
 
@@ -134,7 +154,66 @@ NAME                                                STATUS   ROLES    AGE   VERS
 gke-<cluster_name>-node-pool-e058a106-zn2b          Ready    <none>   10m   v1.18.12-gke.1210
 ```
 
-### Cleaning up
+## Deploying an application
+
+The role `k8s-deployment` contains an example of how deploy a `NGINX` container in the `Kubernetes` cluster.
+
+The role will create:
+
+- [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+- [Kubernetes Pod](https://kubernetes.io/docs/concepts/workloads/pods/)
+
+Investigating the role `directory structure`, we noticed that there is a `vars` folder. We Set variables in roles to ensure a value is used in that role, and is not overridden by inventory variables. Refer to [Ansible Using Variables](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#variable-examples) documentation for more details.
+
+Execute the following command to deploy the `Nginx` web-server:
+
+`ansible-playbook ansible/deploy-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+
+**Output:**
+
+```text
+PLAY [deploy application] **********************************************************
+
+TASK [k8s-deployment : Create a k8s namespace] *************************************
+changed: [localhost]
+
+TASK [k8s-deployment : Create a k8s service to expose nginx] ***********************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************
+localhost: ok=2  changed=2  unreachable=0  failed=0  skipped=0  rescued=0  ignored=0 
+```
+
+### Accessing the Nginx
+
+Execute the following commands and then access the `Nginx` using this [URL](http://127.0.0.1:8080).
+
+```bash
+export POD_NAME=$(kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath="{.items[0].metadata.name}")
+kubectl --namespace nginx port-forward $POD_NAME 8080:80 
+```
+
+## Cleaning up
+
+### Nginx Namespace and Pod
+
+Execute the following command to remove the `Nginx` resources created but, keep the Kubernetes cluster:
+
+`ansible-playbook ansible/undeploy-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+
+**Output:**
+
+```text
+PLAY [undeploy application] ********************************************************
+
+TASK [destroy_k8s_deployment : Destroy a k8s namespace] ****************************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************
+localhost: ok=1  changed=1  unreachable=0  failed=0  skipped=0  rescued=0  ignored=0 
+```
+
+### Entire Kubernetes Cluster
 
 Execute the following command to destroy the `Kubernetes` cluster:
 
@@ -155,7 +234,9 @@ PLAY RECAP *********************************************************************
 localhost: ok=2   changed=2   unreachable=0   failed=0   skipped=0   rescued=0   ignored=0 
 ```
 
-## Next Steps
+## References
 
-Visit [Ansible Documentation](https://docs.ansible.com) page for more information on how to expand your Ansible knowledge and usage.
-Visit [Ansible Google Cloud Collection](https://docs.ansible.com/ansible/latest/collections/google/cloud/) page for more information on available modules.
+- [Ansible Documentation](https://docs.ansible.com) for more information on how to expand your Ansible knowledge and usage.
+- [Ansible Google Cloud Collection](https://docs.ansible.com/ansible/latest/collections/google/cloud/) for more information on available modules.
+- [Ansible Kubernetes module](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html#ansible-collections-kubernetes-core-k8s-module) for more information on `Kubernetes` automation.
+- [Ansible Roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html#roles) for `roles` specific documentation.
