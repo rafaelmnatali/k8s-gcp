@@ -198,6 +198,10 @@ kubectl --namespace nginx port-forward $POD_NAME 8080:80
 
 ![Network Policy](./img/k8s-network-policy.png)
 
+Now that we have a running cluster and a working application, the next step is to secure the traffic flow to our Nginx pod. We will do that using [Kubernetes Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/#default-deny-all-ingress-traffic).
+As we can see in the diagram above, we will **allow** communication from other pods in the same namespace as the Nginx pod while **denying** connection from the **external** namespace.
+The role k8s-policies contains the manifest files to enable this configuration. It will create the **external** namespace and deploy a couple of [busybox](https://busybox.net) containers to help us demonstrate the policies.
+
 ## Cleaning up
 
 ### Nginx Namespace and Pod
