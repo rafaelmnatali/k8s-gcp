@@ -202,7 +202,37 @@ Now that we have a running cluster and a working application, the next step is t
 
 As we can see in the diagram above, we will **allow** communication from other pods in the same namespace as the Nginx pod while **denying** connection from the **external** namespace.
 
-The role k8s-policies contains the manifest files to enable this configuration. It will create the **external** namespace and deploy a couple of [busybox](https://busybox.net) containers to help us demonstrate the policies.
+The role `k8s-policies` contains the manifest files to enable this configuration. It will create the **external** namespace and deploy a couple of [busybox](https://busybox.net) containers to help us demonstrate the policies.
+
+Execute the following command to deploy the `Nginx` web-server:
+
+`ansible-playbook ansible/secure-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+
+**Output:**
+
+```text
+PLAY [deploy application] **********************************************************************
+
+TASK [k8s-policies : Create busybox pod on Nginx namespace] ************************************************************************************************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************************
+localhost: ok=1    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+```
+
+### Testing communication from the Nginx Namespace
+
+Retrieve the `ip address` of the `nginx` pod:
+
+`kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath="{.items[0].status.podIP}"`
+
+Use the `busybox` container to connect to the `nginx` pod:
+
+```bash
+$ kubectl -n nginx exec busybox -- wget --spider 10.40.1.10
+Connecting to 10.40.1.10 (10.40.1.10:80)
+remote file exists
+```
 
 ## Cleaning up
 

@@ -1,0 +1,20 @@
+---
+- name: Create busybox pod on Nginx namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: busybox
+        namespace: "{{ namespace }}"
+        labels:
+          app: busybox
+      spec:
+        containers:
+          - name: busybox
+            image: busybox
+            imagePullPolicy: Always
+            command:
+              - sleep
+              - "3600"
