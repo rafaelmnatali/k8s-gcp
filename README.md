@@ -12,6 +12,7 @@ Automations:
 
 - [Provision Kubernetes](#provision-kubernetes)
 - [Deploying an application](#deploying-an-application)
+- [Securing an application](#securing-an-application)
 
 ## Ansible
 
@@ -192,6 +193,10 @@ Execute the following commands and then access the `Nginx` using this [URL](http
 export POD_NAME=$(kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath="{.items[0].metadata.name}")
 kubectl --namespace nginx port-forward $POD_NAME 8080:80 
 ```
+
+## Securing an application
+
+![Network Policy](./img/k8s-network-policy.png)
 
 ## Cleaning up
 
