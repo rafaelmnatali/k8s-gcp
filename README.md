@@ -70,6 +70,9 @@ The local environment used to test the scripts had the following software:
         │   │   └── main.yml
         │   └── vars
         │       └── main.yml
+        ├── k8s-policies           # Ansible role to configure k8s network policies
+        │   └── tasks
+        │       └── main.yml
         └── network                # Ansible role to create VPC
             └── tasks
                 └── main.yml
@@ -110,7 +113,9 @@ Refer to Ansible documentation on [How to build your inventory](https://docs.ans
 
 Execute the following command to provision the `Kubernetes` cluster:
 
-`ansible-playbook ansible/create-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+```bash
+ansible-playbook ansible/create-k8s.yml -i ansible/inventory/<your-inventory-filename>
+```
 
 **Output:**
 
@@ -134,7 +139,9 @@ localhost: ok=3  changed=3  unreachable=0  failed=0  skipped=0  rescued=0  ignor
 
 Use the [gcloud](https://cloud.google.com/sdk/gcloud) command-line tool to connect to the Kubernetes cluster:
 
-`gcloud container clusters get-credentials <cluster_name> --zone <zone> --project <project_id>`
+```bash
+gcloud container clusters get-credentials <cluster_name> --zone <zone> --project <project_id>
+```
 
 _Note:_ replace the variables with the values used in the inventory file. Also, it's possible to retrieve this command from the `Kubernetes Cluster` page on `GCP` console.
 
@@ -151,6 +158,11 @@ After connecting to the cluster use the [kubectl](https://kubernetes.io/docs/ref
 
 ```text
 kubectl get nodes
+```
+
+**Output:**
+
+```text
 NAME                                                STATUS   ROLES    AGE   VERSION
 gke-<cluster_name>-node-pool-e058a106-zn2b          Ready    <none>   10m   v1.18.12-gke.1210
 ```
@@ -168,7 +180,9 @@ Investigating the role `directory structure`, we noticed that there is a `vars` 
 
 Execute the following command to deploy the `Nginx` web-server:
 
-`ansible-playbook ansible/deploy-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+```bash
+ansible-playbook ansible/deploy-app-k8s.yml -i ansible/inventory/<your-inventory-filename>
+```
 
 **Output:**
 
@@ -206,7 +220,9 @@ The role `k8s-policies` contains the manifest files to enable this configuration
 
 Execute the following command to deploy the `Nginx` web-server:
 
-`ansible-playbook ansible/secure-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+```bash
+ansible-playbook ansible/secure-app-k8s.yml -i ansible/inventory/<your-inventory-filename>
+```
 
 **Output:**
 
@@ -220,16 +236,25 @@ PLAY RECAP *********************************************************************
 localhost: ok=1    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
-### Testing communication from the Nginx Namespace
+### Testing communication between the pods
 
 Retrieve the `ip address` of the `nginx` pod:
 
-`kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath="{.items[0].status.podIP}"`
+```bash
+kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath="{.items[0].status.podIP}"
+```
+
+#### Inside the Nginx namespace
 
 Use the `busybox` container to connect to the `nginx` pod:
 
 ```bash
-$ kubectl -n nginx exec busybox -- wget --spider 10.40.1.10
+kubectl -n nginx exec busybox -- wget --spider 10.40.1.10
+```
+
+**Output:**
+
+```text
 Connecting to 10.40.1.10 (10.40.1.10:80)
 remote file exists
 ```

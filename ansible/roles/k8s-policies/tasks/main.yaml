@@ -18,3 +18,32 @@
             command:
               - sleep
               - "3600"
+
+- name: Create external namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: external
+
+- name: Create busybox pod on External namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: busybox
+        namespace: external
+        labels:
+          app: busybox
+      spec:
+        containers:
+          - name: busybox
+            image: busybox
+            imagePullPolicy: Always
+            command:
+              - sleep
+              - "3600"
