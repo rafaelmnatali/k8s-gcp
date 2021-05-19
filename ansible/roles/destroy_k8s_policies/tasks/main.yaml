@@ -11,9 +11,9 @@
       spec:
         podSelector: {}
         policyTypes:
-        - Ingress
+          - Ingress
         ingress:
-        - from:
-          - namespaceSelector:
-              matchLabels:
-                app: "{{ namespace }}"
+          - from:
+              - namespaceSelector:
+                  matchLabels:
+                    app: "{{ namespace }}"
