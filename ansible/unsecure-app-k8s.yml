@@ -1,0 +1,9 @@
+---
+- name: destroy infra
+  hosts: localhost
+  gather_facts: false
+  environment:
+    GOOGLE_CREDENTIALS: "{{ credentials_file }}"
+
+  roles:
+    - destroy_k8s_policies

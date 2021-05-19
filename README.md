@@ -59,6 +59,9 @@ The local environment used to test the scripts had the following software:
         ├── destroy_k8s_deployment # Ansible role to remove the Nginx web-server
         │       └── tasks
         │           └── main.yml
+        ├── destroy_k8s_policies   # Ansible role to remove the k8s network policies
+        │       └── tasks
+        │           └── main.yml
         ├── destroy_network        # Ansible role to remove VPC
         │   └── tasks
         │       └── main.yml
@@ -229,11 +232,20 @@ ansible-playbook ansible/secure-app-k8s.yml -i ansible/inventory/<your-inventory
 ```text
 PLAY [deploy application] **********************************************************************
 
-TASK [k8s-policies : Create busybox pod on Nginx namespace] ************************************************************************************************
+TASK [k8s-policies : Create busybox pod on Nginx namespace] ************************************
+ok: [localhost]
+
+TASK [k8s-policies : Create external namespace] ************************************************
+ok: [localhost]
+
+TASK [k8s-policies : Create busybox pod on External namespace] *********************************
+ok: [localhost]
+
+TASK [k8s-policies : Create network policy to deny ingress] ************************************************************************************************
 changed: [localhost]
 
 PLAY RECAP *************************************************************************************
-localhost: ok=1    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+localhost: ok=4    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 ### Testing communication between the pods
@@ -244,7 +256,7 @@ Retrieve the `ip address` of the `nginx` pod:
 kubectl get pods --namespace nginx -l "app=nginx" -o jsonpath="{.items[0].status.podIP}"
 ```
 
-#### Inside the Nginx namespace
+#### From a pod in the Nginx namespace
 
 Use the `busybox` container to connect to the `nginx` pod:
 
@@ -257,6 +269,28 @@ kubectl -n nginx exec busybox -- wget --spider 10.40.1.10
 ```text
 Connecting to 10.40.1.10 (10.40.1.10:80)
 remote file exists
+```
+
+#### From a pod in the External namespace
+
+```bash
+kubectl -n external exec busybox -- wget --spider 10.40.1.13
+```
+
+**Output:**
+
+```text
+Connecting to 10.40.1.13 (10.40.1.13:80)
+wget: can't connect to remote host (10.40.1.13): Connection timed out
+command terminated with exit code 1
+```
+
+> This is the expected behaviour because our goal is to only allow access from pods in the nginx namespace.
+
+Execute the following playbook to remove the `Network Policy` and re-run the `wget` command from the `external` namespace and see what happens!
+
+```bash
+ansible-playbook ansible/unsecure-app-k8s.yml -i ansible/inventory/<your-inventory-filename>
 ```
 
 ## Cleaning up
