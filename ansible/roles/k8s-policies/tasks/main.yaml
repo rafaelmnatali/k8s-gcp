@@ -1,0 +1,68 @@
+---
+- name: Create busybox pod on Nginx namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: busybox
+        namespace: "{{ namespace }}"
+        labels:
+          app: busybox
+      spec:
+        containers:
+          - name: busybox
+            image: busybox
+            imagePullPolicy: Always
+            command:
+              - sleep
+              - "3600"
+
+- name: Create external namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: external
+
+- name: Create busybox pod on External namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Pod
+      metadata:
+        name: busybox
+        namespace: external
+        labels:
+          app: busybox
+      spec:
+        containers:
+          - name: busybox
+            image: busybox
+            imagePullPolicy: Always
+            command:
+              - sleep
+              - "3600"
+
+- name: Create network policy to deny ingress
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-traffic-nginx
+        namespace: "{{ namespace }}"
+      spec:
+        podSelector: {}
+        policyTypes:
+          - Ingress
+        ingress:
+          - from:
+              - namespaceSelector:
+                  matchLabels:
+                    app: "{{ namespace }}"
