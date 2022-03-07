@@ -13,6 +13,7 @@ Automations:
 - [Provision Kubernetes](#provision-kubernetes)
 - [Deploying an application](#deploying-an-application)
 - [Securing an application](#securing-an-application)
+- [Deploying a stateful application](#deploying-a-stateful-application)
 
 ## Ansible
 
@@ -74,6 +75,9 @@ The local environment used to test the scripts had the following software:
         │   └── vars
         │       └── main.yml
         ├── k8s-policies           # Ansible role to configure k8s network policies
+        │   └── tasks
+        │       └── main.yml
+        ├── k8s-statefulset        # Ansible role to deploy a Kafka cluster
         │   └── tasks
         │       └── main.yml
         └── network                # Ansible role to create VPC
@@ -292,6 +296,25 @@ Execute the following playbook to remove the `Network Policy` and re-run the `wg
 ```bash
 ansible-playbook ansible/unsecure-app-k8s.yml -i ansible/inventory/<your-inventory-filename>
 ```
+
+## Deploying a stateful application
+
+The role `k8s-statefulset` contains an example of how to deploy a [Kafka](https://kafka.apache.org) broker in the `Kubernetes` cluster.
+
+The role will create:
+
+- [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+- [Kubernetes Services](https://kubernetes.io/docs/concepts/services-networking/service/)
+- [Kubernetes StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
+- [Kubernetes Pod](https://kubernetes.io/docs/concepts/workloads/pods/)
+
+Execute the following command to deploy the `Kafka` cluster:
+
+```bash
+ansible-playbook ansible/deploy-statefulset-k8s.yml -i ansible/inventory/gcp.yml
+```
+
+**Output:**
 
 ## Cleaning up
 

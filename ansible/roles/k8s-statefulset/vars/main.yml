@@ -1,0 +1,7 @@
+---
+zookeeper_namespace: zookeeper
+zookeeper_headless_service: zookeeper-headless
+zookeeper_app: zookeeper-app
+zookeeper_service: zookeeper-service
+zookeeper_image: bitnami/zookeeper:3.6.2
+zookeeper_replicas: 1
