@@ -23,14 +23,14 @@
         type: ClusterIP
         clusterIP: None
         ports:
-        - name: tcp-peers
-          port: 2888
-          protocol: TCP
-          targetPort: tcp-peers
-        - name: tcp-leader
-          port: 3888
-          protocol: TCP
-          targetPort: tcp-leader
+          - name: tcp-peers
+            port: 2888
+            protocol: TCP
+            targetPort: tcp-peers
+          - name: tcp-leader
+            port: 3888
+            protocol: TCP
+            targetPort: tcp-leader
         selector:
           app: "{{ zookeeper_app }}"
 
@@ -80,102 +80,102 @@
               app: "{{ zookeeper_app }}"
           spec:
             containers:
-            - name: zookeeper
-              image: "{{ zookeeper_image }}"
-              imagePullPolicy: IfNotPresent
-              resources:
-                requests:
-                  cpu: ".5"
-                  memory: "128Mi"
-                limits:
-                  cpu: "1"
-                  memory: "256Mi"
-              command:
-              - bash
-              - -ec
-              - |
-                # Execute entrypoint as usual after obtaining ZOO_SERVER_ID
-                # check ZOO_SERVER_ID in persistent volume via myid
-                # if not present, set based on POD hostname
-                if [[ -f "/bitnami/zookeeper/data/myid" ]]; then
-                  export ZOO_SERVER_ID="$(cat /bitnami/zookeeper/data/myid)"
-                else
-                  HOSTNAME=`hostname -s`
-                  if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then
-                    ORD=${BASH_REMATCH[2]}
-                    export ZOO_SERVER_ID=$((ORD + 1 ))
-                  else
-                    echo "Failed to get index from hostname $HOST"
-                    exit 1
-                  fi
-                fi
-                exec /entrypoint.sh /run.sh
-              env:
-                - name: ZOO_DATA_LOG_DIR
-                - name: ZOO_PORT_NUMBER
-                  value: "2181"
-                - name: ZOO_TICK_TIME
-                  value: "2000"
-                - name: ZOO_INIT_LIMIT
-                  value: "10"
-                - name: ZOO_SYNC_LIMIT
-                  value: "5"
-                - name: ZOO_MAX_CLIENT_CNXNS
-                  value: "60"
-                - name: ZOO_4LW_COMMANDS_WHITELIST
-                  value: srvr, mntr, ruok
-                - name: ZOO_LISTEN_ALLIPS_ENABLED
-                  value: "no"
-                - name: ZOO_AUTOPURGE_INTERVAL
-                  value: "0"
-                - name: ZOO_AUTOPURGE_RETAIN_COUNT
-                  value: "3"
-                - name: ZOO_MAX_SESSION_TIMEOUT
-                  value: "40000"
-                - name: ZOO_SERVERS
-                  value: zookeeper-app-0.zookeeper-headless.zookeeper.svc.cluster.local:2888:3888::1
-                    zookeeper-app-1.zookeeper-headless.zookeeper.svc.cluster.local:2888:3888::2
-                    zookeeper-app-2.zookeeper-headless.zookeeper.svc.cluster.local:2888:3888::3
-                - name: ZOO_ENABLE_AUTH
-                  value: "no"
-                - name: ZOO_HEAP_SIZE
-                  value: "256"
-                - name: ALLOW_ANONYMOUS_LOGIN
-                  value: "yes"
-              ports:
-              - name: tcp-client
-                containerPort: 2181
-              - name: tcp-peers
-                containerPort: 2888
-              - name: tcp-leader
-                containerPort: 3888
-              - name: http-admin
-                containerPort: 8080
-              livenessProbe:
-                tcpSocket:
-                  port: 2181
-                initialDelaySeconds: 30
-                periodSeconds: 60
-              readinessProbe:
-                tcpSocket:
-                  port: 2181
-                initialDelaySeconds: 30
-                periodSeconds: 60
-              volumeMounts:
-              - mountPath: /bitnami/zookeeper
-                name: data
+              - name: zookeeper
+                image: "{{ zookeeper_image }}"
+                imagePullPolicy: IfNotPresent
+                resources:
+                  requests:
+                    cpu: ".5"
+                    memory: "128Mi"
+                  limits:
+                    cpu: "1"
+                    memory: "256Mi"
+                command:
+                  - bash
+                  - -ec
+                  - |
+                    # Execute entrypoint as usual after obtaining ZOO_SERVER_ID
+                    # check ZOO_SERVER_ID in persistent volume via myid
+                    # if not present, set based on POD hostname
+                    if [[ -f "/bitnami/zookeeper/data/myid" ]]; then
+                      export ZOO_SERVER_ID="$(cat /bitnami/zookeeper/data/myid)"
+                    else
+                      HOSTNAME=`hostname -s`
+                      if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then
+                        ORD=${BASH_REMATCH[2]}
+                        export ZOO_SERVER_ID=$((ORD + 1 ))
+                      else
+                        echo "Failed to get index from hostname $HOST"
+                        exit 1
+                      fi
+                    fi
+                    exec /entrypoint.sh /run.sh
+                env:
+                  - name: ZOO_DATA_LOG_DIR
+                  - name: ZOO_PORT_NUMBER
+                    value: "2181"
+                  - name: ZOO_TICK_TIME
+                    value: "2000"
+                  - name: ZOO_INIT_LIMIT
+                    value: "10"
+                  - name: ZOO_SYNC_LIMIT
+                    value: "5"
+                  - name: ZOO_MAX_CLIENT_CNXNS
+                    value: "60"
+                  - name: ZOO_4LW_COMMANDS_WHITELIST
+                    value: srvr, mntr, ruok
+                  - name: ZOO_LISTEN_ALLIPS_ENABLED
+                    value: "no"
+                  - name: ZOO_AUTOPURGE_INTERVAL
+                    value: "0"
+                  - name: ZOO_AUTOPURGE_RETAIN_COUNT
+                    value: "3"
+                  - name: ZOO_MAX_SESSION_TIMEOUT
+                    value: "40000"
+                  - name: ZOO_SERVERS
+                    value: zookeeper-app-0.zookeeper-headless.zookeeper.svc.cluster.local:2888:3888::1
+                      zookeeper-app-1.zookeeper-headless.zookeeper.svc.cluster.local:2888:3888::2
+                      zookeeper-app-2.zookeeper-headless.zookeeper.svc.cluster.local:2888:3888::3
+                  - name: ZOO_ENABLE_AUTH
+                    value: "no"
+                  - name: ZOO_HEAP_SIZE
+                    value: "256"
+                  - name: ALLOW_ANONYMOUS_LOGIN
+                    value: "yes"
+                ports:
+                  - name: tcp-client
+                    containerPort: 2181
+                  - name: tcp-peers
+                    containerPort: 2888
+                  - name: tcp-leader
+                    containerPort: 3888
+                  - name: http-admin
+                    containerPort: 8080
+                livenessProbe:
+                  tcpSocket:
+                    port: 2181
+                  initialDelaySeconds: 30
+                  periodSeconds: 60
+                readinessProbe:
+                  tcpSocket:
+                    port: 2181
+                  initialDelaySeconds: 30
+                  periodSeconds: 60
+                volumeMounts:
+                  - mountPath: /bitnami/zookeeper
+                    name: data
             securityContext:
               fsGroup: 1001
               runAsUser: 1001
         volumeClaimTemplates:
-        - metadata:
-            name: data
-          spec:
-            accessModes:
-            - ReadWriteOnce
-            resources:
-              requests:
-                storage: 100Mi
+          - metadata:
+              name: data
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 100Mi
 
 - name: wait for zookeeper pods to be running
   # https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#wait
