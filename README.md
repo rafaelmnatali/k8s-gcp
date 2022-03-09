@@ -15,6 +15,8 @@ Automations:
 - [Securing an application](#securing-an-application)
 - [Deploying a stateful application](#deploying-a-stateful-application)
 
+> Use the Table of Contents on the top-left corner to explore all options.
+
 ## Ansible
 
 [Ansible](https://www.ansible.com) is the tool of choice to implement automation. Ansible is one of the most utilised automation tools in the market and allows the creation of the automation necessary to run the `Kubernetes cluster.
