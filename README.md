@@ -318,26 +318,6 @@ ansible-playbook ansible/deploy-statefulset-k8s.yml -i ansible/inventory/gcp.yml
 
 ## Cleaning up
 
-### Nginx Namespace and Pod
-
-Execute the following command to remove the `Nginx` resources created but, keep the Kubernetes cluster:
-
-`ansible-playbook ansible/undeploy-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
-
-**Output:**
-
-```text
-PLAY [undeploy application] ********************************************************
-
-TASK [destroy_k8s_deployment : Destroy a k8s namespace] ****************************
-changed: [localhost]
-
-PLAY RECAP *************************************************************************
-localhost: ok=1  changed=1  unreachable=0  failed=0  skipped=0  rescued=0  ignored=0 
-```
-
-### Entire Kubernetes Cluster
-
 Execute the following command to destroy the `Kubernetes` cluster:
 
 `ansible-playbook ansible/destroy-k8s.yml -i ansible/inventory/<your-inventory-filename>`

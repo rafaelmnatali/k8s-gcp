@@ -5,3 +5,9 @@ zookeeper_app: zookeeper-app
 zookeeper_service: zookeeper-service
 zookeeper_image: bitnami/zookeeper:3.6.2
 zookeeper_replicas: 1
+
+kafka_namespace: kafka
+kafka_svc_broker: kafka-headless
+kafka_app_broker: kafka-broker
+kafka_replicas: 1
+kafka_image: bitnami/kafka:2.7.0
