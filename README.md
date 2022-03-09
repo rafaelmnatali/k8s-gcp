@@ -316,6 +316,45 @@ ansible-playbook ansible/deploy-statefulset-k8s.yml -i ansible/inventory/gcp.yml
 
 **Output:**
 
+PLAY [deploy statefulset application] **********************************************************
+
+TASK [k8s-statefulset : create namespace zookeeper] ********************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : create zookeeper-headless service] *************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : create zookeeper service] **********************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : deploy apache zookeeper] ***********************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : wait for zookeeper pods to be running] ************************************************************************************************
+ok: [localhost]
+
+TASK [k8s-statefulset : create namespace kafka] ************************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : create kafka service for Broker] ***************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : deploy apache kafka Broker 1] ******************************************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************************
+localhost: ok=8    changed=7    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+### Testing Kafka
+
+Connect to the `broker` pod, create, and list a `topic`.
+
+```bash
+kubectl exec -it -n kafka kafka-broker-0 -- bash
+/opt/bitnami/kafka/bin/kafka-topics.sh --zookeeper zookeeper-headless.zookeeper:2181 --create --topic test-topic --partitions 1 --replication-factor 1
+/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
+```
+
 ## Cleaning up
 
 Execute the following command to destroy the `Kubernetes` cluster:
