@@ -1,0 +1,8 @@
+- name: destroy GCP network
+  google.cloud.gcp_compute_network:
+    name: network-{{ cluster_name }}
+    auto_create_subnetworks: 'true'
+    project: "{{ project_id }}"
+    auth_kind: serviceaccount
+    service_account_file: "{{ credentials_file }}"
+    state: absent
