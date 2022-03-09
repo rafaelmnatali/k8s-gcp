@@ -1,0 +1,375 @@
+---
+- name: create namespace zookeeper
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ zookeeper_namespace }}"
+
+- name: create zookeeper-headless service
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ zookeeper_headless_service }}"
+        namespace: "{{ zookeeper_namespace }}"
+        labels:
+          app: "{{ zookeeper_app }}"
+      spec:
+        type: ClusterIP
+        clusterIP: None
+        ports:
+          - name: tcp-peers
+            port: 2888
+            protocol: TCP
+            targetPort: tcp-peers
+          - name: tcp-leader
+            port: 3888
+            protocol: TCP
+            targetPort: tcp-leader
+        selector:
+          app: "{{ zookeeper_app }}"
+
+- name: create zookeeper service
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ zookeeper_service }}"
+        namespace: "{{ zookeeper_namespace }}"
+        labels:
+          app: "{{ zookeeper_app }}"
+      spec:
+        clusterIP: None
+        ports:
+          - name: http-admin
+            port: 8080
+            protocol: TCP
+            targetPort: http-admin
+          - name: tcp-client
+            port: 2181
+            protocol: TCP
+            targetPort: tcp-client
+        selector:
+          app: "{{ zookeeper_app }}"
+
+- name: deploy apache zookeeper
+  k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: "{{ zookeeper_app }}"
+        namespace: "{{ zookeeper_namespace }}"
+      spec:
+        selector:
+          matchLabels:
+            app: "{{ zookeeper_app }}"
+        serviceName: "{{ zookeeper_headless_service }}"
+        replicas: "{{ zookeeper_replicas }}"
+        template:
+          metadata:
+            labels:
+              app: "{{ zookeeper_app }}"
+          spec:
+            containers:
+              - name: zookeeper
+                image: "{{ zookeeper_image }}"
+                imagePullPolicy: IfNotPresent
+                resources:
+                  requests:
+                    cpu: ".5"
+                    memory: "128Mi"
+                  limits:
+                    cpu: "1"
+                    memory: "256Mi"
+                command:
+                  - bash
+                  - -ec
+                  - |
+                    # Execute entrypoint as usual after obtaining ZOO_SERVER_ID
+                    # check ZOO_SERVER_ID in persistent volume via myid
+                    # if not present, set based on POD hostname
+                    if [[ -f "/bitnami/zookeeper/data/myid" ]]; then
+                      export ZOO_SERVER_ID="$(cat /bitnami/zookeeper/data/myid)"
+                    else
+                      HOSTNAME=`hostname -s`
+                      if [[ $HOSTNAME =~ (.*)-([0-9]+)$ ]]; then
+                        ORD=${BASH_REMATCH[2]}
+                        export ZOO_SERVER_ID=$((ORD + 1 ))
+                      else
+                        echo "Failed to get index from hostname $HOST"
+                        exit 1
+                      fi
+                    fi
+                    exec /entrypoint.sh /run.sh
+                env:
+                  - name: ZOO_DATA_LOG_DIR
+                  - name: ZOO_PORT_NUMBER
+                    value: "2181"
+                  - name: ZOO_TICK_TIME
+                    value: "2000"
+                  - name: ZOO_INIT_LIMIT
+                    value: "10"
+                  - name: ZOO_SYNC_LIMIT
+                    value: "5"
+                  - name: ZOO_MAX_CLIENT_CNXNS
+                    value: "60"
+                  - name: ZOO_4LW_COMMANDS_WHITELIST
+                    value: srvr, mntr, ruok
+                  - name: ZOO_LISTEN_ALLIPS_ENABLED
+                    value: "no"
+                  - name: ZOO_AUTOPURGE_INTERVAL
+                    value: "0"
+                  - name: ZOO_AUTOPURGE_RETAIN_COUNT
+                    value: "3"
+                  - name: ZOO_MAX_SESSION_TIMEOUT
+                    value: "40000"
+                  - name: ZOO_SERVERS
+                    value: zookeeper-app-0.zookeeper-headless.zookeeper.svc.cluster.local:2888:3888::1
+                  - name: ZOO_ENABLE_AUTH
+                    value: "no"
+                  - name: ZOO_HEAP_SIZE
+                    value: "256"
+                  - name: ALLOW_ANONYMOUS_LOGIN
+                    value: "yes"
+                ports:
+                  - name: tcp-client
+                    containerPort: 2181
+                  - name: tcp-peers
+                    containerPort: 2888
+                  - name: tcp-leader
+                    containerPort: 3888
+                  - name: http-admin
+                    containerPort: 8080
+                livenessProbe:
+                  tcpSocket:
+                    port: 2181
+                  initialDelaySeconds: 30
+                  periodSeconds: 60
+                readinessProbe:
+                  tcpSocket:
+                    port: 2181
+                  initialDelaySeconds: 30
+                  periodSeconds: 60
+                volumeMounts:
+                  - mountPath: /bitnami/zookeeper
+                    name: data
+            securityContext:
+              fsGroup: 1001
+              runAsUser: 1001
+        volumeClaimTemplates:
+          - metadata:
+              name: data
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 100Mi
+
+- name: wait for zookeeper pods to be running
+  # https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#wait
+  command: "kubectl -n {{ zookeeper_namespace }} wait --for=condition=ready pods --all --timeout=-1s"
+  changed_when: false
+
+- name: create namespace kafka
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: "{{ kafka_namespace }}"
+
+- name: create kafka service for Broker
+  k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ kafka_svc_broker }}"
+        namespace: "{{ kafka_namespace }}"
+        labels:
+          app: "{{ kafka_app_broker }}"
+      spec:
+        type: ClusterIP
+        clusterIP: None
+        ports:
+          - name: tcp-client
+            port: 9092
+            protocol: TCP
+            targetPort: client
+          - name: tcp-internal
+            port: 9093
+            protocol: TCP
+        selector:
+          app: "{{ kafka_app_broker }}"
+
+- name: deploy apache kafka Broker 1
+  k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: "{{ kafka_app_broker }}"
+        namespace: "{{ kafka_namespace }}"
+      spec:
+        selector:
+          matchLabels:
+            app: "{{ kafka_app_broker }}"
+        serviceName: "{{ kafka_svc_broker }}"
+        replicas: "{{ kafka_replicas }}"
+        template:
+          metadata:
+            labels:
+              app: "{{ kafka_app_broker }}"
+          spec:
+            containers:
+              - name: kafka-broker
+                image: "{{ kafka_image }}"
+                imagePullPolicy: IfNotPresent
+                resources:
+                  requests:
+                    cpu: ".5"
+                    memory: "256Mi"
+                  limits:
+                    cpu: "1"
+                    memory: "512Mi"
+                command:
+                  - bash
+                  - -ec
+                  - |
+                    #!/bin/bash
+                    ID="${POD_NAME#"kafka-"}"
+                    if [[ -f "/bitnami/kafka/data/meta.properties" ]]; then
+                        export KAFKA_CFG_BROKER_ID="$(grep "broker.id" /bitnami/kafka/data/meta.properties | awk -F '=' '{print $2}')"
+                    else
+                        export KAFKA_CFG_BROKER_ID="$((ID + 0))"
+                    fi
+                    exec /entrypoint.sh /run.sh
+                env:
+                  - name: POD_NAME
+                    valueFrom:
+                      fieldRef:
+                        apiVersion: v1
+                        fieldPath: metadata.name
+                  - name: KAFKA_CFG_ZOOKEEPER_CONNECT
+                    value: zookeeper-headless.zookeeper.svc.cluster.local
+                  - name: KAFKA_INTER_BROKER_LISTENER_NAME
+                    value: INTERNAL
+                  - name: KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP
+                    value: INTERNAL:PLAINTEXT,CLIENT:PLAINTEXT
+                  - name: KAFKA_CFG_LISTENERS
+                    value: INTERNAL://:9093,CLIENT://:9092
+                  - name: KAFKA_CFG_ADVERTISED_LISTENERS
+                    value: INTERNAL://$(POD_NAME).kafka-headless.kafka.svc.cluster.local:9093,CLIENT://$(POD_NAME).kafka-headless.kafka.svc.cluster.local:9092
+                  - name: ALLOW_PLAINTEXT_LISTENER
+                    value: "yes"
+                  - name: KAFKA_VOLUME_DIR
+                    value: /bitnami/kafka
+                  - name: KAFKA_LOG_DIR
+                    value: /opt/bitnami/kafka/logs
+                  - name: KAFKA_CFG_DELETE_TOPIC_ENABLE
+                    value: "false"
+                  - name: KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE
+                    value: "true"
+                  - name: KAFKA_HEAP_OPTS
+                    value: -Xmx512m -Xms512m
+                  - name: KAFKA_CFG_LOG_FLUSH_INTERVAL_MESSAGES
+                    value: "10000"
+                  - name: KAFKA_CFG_LOG_FLUSH_INTERVAL_MS
+                    value: "1000"
+                  - name: KAFKA_CFG_LOG_RETENTION_BYTES
+                    value: "1073741824"
+                  - name: KAFKA_CFG_LOG_RETENTION_CHECK_INTERVALS_MS
+                    value: "300000"
+                  - name: KAFKA_CFG_LOG_RETENTION_HOURS
+                    value: "168"
+                  - name: KAFKA_CFG_MESSAGE_MAX_BYTES
+                    value: "1000012"
+                  - name: KAFKA_CFG_LOG_SEGMENT_BYTES
+                    value: "1073741824"
+                  - name: KAFKA_CFG_LOG_DIRS
+                    value: /bitnami/kafka/data
+                  - name: KAFKA_CFG_DEFAULT_REPLICATION_FACTOR
+                    value: "1"
+                  - name: KAFKA_CFG_OFFSETS_TOPIC_REPLICATION_FACTOR
+                    value: "1"
+                  - name: KAFKA_CFG_TRANSACTION_STATE_LOG_REPLICATION_FACTOR
+                    value: "1"
+                  - name: KAFKA_CFG_TRANSACTION_STATE_LOG_MIN_ISR
+                    value: "1"
+                  - name: KAFKA_CFG_NUM_IO_THREADS
+                    value: "8"
+                  - name: KAFKA_CFG_NUM_NETWORK_THREADS
+                    value: "3"
+                  - name: KAFKA_CFG_NUM_PARTITIONS
+                    value: "1"
+                  - name: KAFKA_CFG_NUM_RECOVERY_THREADS_PER_DATA_DIR
+                    value: "1"
+                  - name: KAFKA_CFG_SOCKET_RECEIVE_BUFFER_BYTES
+                    value: "102400"
+                  - name: KAFKA_CFG_SOCKET_REQUEST_MAX_BYTES
+                    value: "104857600"
+                  - name: KAFKA_CFG_SOCKET_SEND_BUFFER_BYTES
+                    value: "102400"
+                  - name: KAFKA_CFG_ZOOKEEPER_CONNECTION_TIMEOUT_MS
+                    value: "6000"
+                ports:
+                  - containerPort: 9092
+                    name: kafka-client
+                    protocol: TCP
+                  - containerPort: 9093
+                    name: kafka-internal
+                    protocol: TCP
+                readinessProbe:
+                  failureThreshold: 6
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  successThreshold: 1
+                  tcpSocket:
+                    port: kafka-client
+                  timeoutSeconds: 5
+                livenessProbe:
+                  failureThreshold: 6
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                  successThreshold: 1
+                  tcpSocket:
+                    port: kafka-client
+                  timeoutSeconds: 5
+                volumeMounts:
+                  - mountPath: /bitnami/kafka
+                    name: data
+                  - mountPath: /opt/bitnami/kafka/logs
+                    name: logs
+            securityContext:
+              fsGroup: 1001
+              runAsUser: 1001
+            volumes:
+              - emptyDir: {}
+                name: logs
+        volumeClaimTemplates:
+          - metadata:
+              name: data
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 100Mi
+
+- name: wait for kafka pods to be running
+  # https://kubernetes.io/docs/reference/generated/kubectl/kubectl-commands#wait
+  command: "kubectl -n {{ kafka_namespace }} wait --for=condition=ready pods --all --timeout=-1s"
+  changed_when: false

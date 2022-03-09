@@ -13,6 +13,7 @@ Automations:
 - [Provision Kubernetes](#provision-kubernetes)
 - [Deploying an application](#deploying-an-application)
 - [Securing an application](#securing-an-application)
+- [Deploying a stateful application](#deploying-a-stateful-application)
 
 ## Ansible
 
@@ -74,6 +75,9 @@ The local environment used to test the scripts had the following software:
         │   └── vars
         │       └── main.yml
         ├── k8s-policies           # Ansible role to configure k8s network policies
+        │   └── tasks
+        │       └── main.yml
+        ├── k8s-statefulset        # Ansible role to deploy a Kafka cluster
         │   └── tasks
         │       └── main.yml
         └── network                # Ansible role to create VPC
@@ -293,27 +297,65 @@ Execute the following playbook to remove the `Network Policy` and re-run the `wg
 ansible-playbook ansible/unsecure-app-k8s.yml -i ansible/inventory/<your-inventory-filename>
 ```
 
-## Cleaning up
+## Deploying a stateful application
 
-### Nginx Namespace and Pod
+The role `k8s-statefulset` contains an example of how to deploy a [Kafka](https://kafka.apache.org) broker in the `Kubernetes` cluster.
 
-Execute the following command to remove the `Nginx` resources created but, keep the Kubernetes cluster:
+The role will create:
 
-`ansible-playbook ansible/undeploy-app-k8s.yml -i ansible/inventory/<your-inventory-filename>`
+- [Kubernetes Namespace](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/)
+- [Kubernetes Services](https://kubernetes.io/docs/concepts/services-networking/service/)
+- [Kubernetes StatefulSet](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/)
+- [Kubernetes Pod](https://kubernetes.io/docs/concepts/workloads/pods/)
+
+Execute the following command to deploy the `Kafka` cluster:
+
+```bash
+ansible-playbook ansible/deploy-statefulset-k8s.yml -i ansible/inventory/gcp.yml
+```
 
 **Output:**
 
-```text
-PLAY [undeploy application] ********************************************************
+PLAY [deploy statefulset application] **********************************************************
 
-TASK [destroy_k8s_deployment : Destroy a k8s namespace] ****************************
+TASK [k8s-statefulset : create namespace zookeeper] ********************************************
 changed: [localhost]
 
-PLAY RECAP *************************************************************************
-localhost: ok=1  changed=1  unreachable=0  failed=0  skipped=0  rescued=0  ignored=0 
+TASK [k8s-statefulset : create zookeeper-headless service] *************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : create zookeeper service] **********************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : deploy apache zookeeper] ***********************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : wait for zookeeper pods to be running] ************************************************************************************************
+ok: [localhost]
+
+TASK [k8s-statefulset : create namespace kafka] ************************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : create kafka service for Broker] ***************************************
+changed: [localhost]
+
+TASK [k8s-statefulset : deploy apache kafka Broker 1] ******************************************
+changed: [localhost]
+
+PLAY RECAP *************************************************************************************
+localhost: ok=8    changed=7    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+
+### Testing Kafka
+
+Connect to the `broker` pod, create, and list a `topic`.
+
+```bash
+kubectl exec -it -n kafka kafka-broker-0 -- bash
+/opt/bitnami/kafka/bin/kafka-topics.sh --zookeeper zookeeper-headless.zookeeper:2181 --create --topic test-topic --partitions 1 --replication-factor 1
+/opt/bitnami/kafka/bin/kafka-topics.sh --bootstrap-server localhost:9092 --list
 ```
 
-### Entire Kubernetes Cluster
+## Cleaning up
 
 Execute the following command to destroy the `Kubernetes` cluster:
 
