@@ -17,12 +17,12 @@
       apiVersion: v1
       kind: Pod
       metadata:
-        name: "{{ zookeeper_app }}"
+        name: "{{ app }}"
         namespace: "{{ namespace }}"
         labels:
-          app: "{{ zookeeper_app }}"
+          app: "{{ app }}"
       spec:
         containers:
-          - name: "{{ zookeeper_app }}"
+          - name: "{{ app }}"
             image: "{{ image }}"
             imagePullPolicy: Always
