@@ -37,9 +37,13 @@ The local environment used to test the scripts had the following software:
 
 | Software | Version |
 |--|--|
-| macOS BigSur | 11.2.1 |
-| Ansible | 3.1.0 |
-| Python | 3.9.2 |
+| macOS Monterey | 12.3.1 |
+| ansible-core | 2.12.16 |
+| Python | 3.8.9 |
+| Python lib `requests` | 2.28.1 |
+| Python lib `google-auth` | 2.9.1 |
+| Python lib `kubernetes` | 24.2.0 |
+| gcloud sdk | 396.0.0 |
 
 ## Ansible Directory Layout
 
