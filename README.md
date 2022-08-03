@@ -21,8 +21,6 @@ Automations:
 
 [Ansible](https://www.ansible.com) is the tool of choice to implement automation. Ansible is one of the most utilised automation tools in the market and allows the creation of the automation necessary to run the `Kubernetes cluster.
 
-[![Ansible Lint](https://github.com/rafaelmnatali/k8s-gcp/actions/workflows/ansible-lint.yml/badge.svg)](https://github.com/rafaelmnatali/k8s-gcp/actions/workflows/ansible-lint.yml)
-
 ## Requisites
 
 - [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
