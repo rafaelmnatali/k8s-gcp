@@ -27,6 +27,7 @@ Automations:
 - [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - [Ansible Google Cloud Platform Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html)
 - [Installing gcloud cli](https://cloud.google.com/sdk/docs/install)
+- [Installing gke-gcloud-auth-plugin](https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke)
 - [google-auth Python package](https://pypi.org/project/google-auth/)
 - [requests Python package](https://pypi.org/project/requests/)
 - [kubernetes Python package](https://pypi.org/project/kubernetes/)
