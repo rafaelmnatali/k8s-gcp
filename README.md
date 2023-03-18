@@ -23,10 +23,13 @@ Automations:
 
 ## Requisites
 
+- [Installing Python](https://www.python.org/downloads/)
 - [Installing Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 - [Ansible Google Cloud Platform Guide](https://docs.ansible.com/ansible/latest/scenario_guides/guide_gce.html)
-- [Installing Python](https://www.python.org/downloads/)
+- [Installing gcloud cli](https://cloud.google.com/sdk/docs/install)
 - [google-auth Python package](https://pypi.org/project/google-auth/)
+- [requests Python package](https://pypi.org/project/requests/)
+- [kubernetes Python package](https://pypi.org/project/kubernetes/)
 - [Ansible Kubernetes Module requirements](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html#requirements)
 
 ## Environment
@@ -35,13 +38,13 @@ The local environment used to test the scripts had the following software:
 
 | Software | Version |
 |--|--|
-| macOS Monterey | 12.3.1 |
-| ansible-core | 2.12.16 |
-| Python | 3.8.9 |
-| Python lib `requests` | 2.28.1 |
-| Python lib `google-auth` | 2.9.1 |
-| Python lib `kubernetes` | 24.2.0 |
-| gcloud sdk | 396.0.0 |
+| macOS Ventura | 13.2.1 |
+| ansible-core | 2.14.13 |
+| Python | 3.9.6 |
+| Python lib `requests` | 2.28.2 |
+| Python lib `google-auth` | 2.16.2 |
+| Python lib `kubernetes` | 26.1.0 |
+| gcloud sdk | 422.0.0 |
 
 ## Ansible Directory Layout
 
